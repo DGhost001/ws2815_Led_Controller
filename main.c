@@ -3,6 +3,7 @@
 #include <math.h>
 #include <avr/interrupt.h>
 #include <avr/io.h>
+#include <util/delay.h>
 
 #include "colorTable.h"
 #include "keyboard.h"
@@ -113,6 +114,8 @@ static void setAllLedsToColor(struct Color const * const color)
     }
 
     sei();
+
+    _delay_us(500); //There needs to be at least a 500us gap for the LEDs to commit the Value
 }
 
 static inline void inc(uint8_t * value) {
