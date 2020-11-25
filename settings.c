@@ -13,13 +13,18 @@ struct EepromSettings {
 static struct EepromSettings eepromSettings EEMEM;
 static struct EepromSettings ramSettings;
 
+static uint16_t getRamCrc_( void )
+{
+    return computeCrc((uint8_t const*)&ramSettings, sizeof (struct EepromSettings) - sizeof (ramSettings.crc));
+}
+
 struct Settings * loadSettings( void )
 {
     struct Settings  * settings = NULL; //In case of Error we return a NULL (default)
 
     eeprom_read_block(&ramSettings, &eepromSettings, sizeof(struct EepromSettings)); //Load the settings from the EEPROM
 
-    if(computeCrc((uint8_t const*)&ramSettings, sizeof (struct EepromSettings)) == 0 && //Check the CRC (CRC is at the end ==> if correct
+    if( getRamCrc_() == ramSettings.crc && //Check the CRC (CRC is at the end ==> if correct
             SETTINGS_VERSION == ramSettings.version //the CRC will always be 0 over the complete block) and the Version
             )
     {
@@ -40,7 +45,6 @@ struct Settings * newSettings( void )
 
 void saveSettings( void )
 {
-    ramSettings.crc = computeCrc((uint8_t const*)&ramSettings, sizeof (struct EepromSettings) - sizeof (ramSettings.crc)); //Compute the CRC a leave out the CRC field
-
+    ramSettings.crc = getRamCrc_();
     eeprom_update_block(&ramSettings, &eepromSettings, sizeof (struct EepromSettings)); //Save !
 }
