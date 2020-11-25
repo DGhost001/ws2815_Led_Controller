@@ -15,7 +15,7 @@ static uint8_t noisePoints[2][22];
 static uint8_t ctrlPoints[ELEMENT_COUNT(noisePoints[0])];
 static __flash struct Color const * currentTable;
 
-static uint16_t xorShift( )
+static uint16_t xorShift( void )
 {
     static uint16_t state = 0x12fe;
 
@@ -26,7 +26,7 @@ static uint16_t xorShift( )
     return state;
 }
 
-static void initNoisePoints()
+static void initNoisePoints( void )
 {
     for(unsigned i = 0; i < ELEMENT_COUNT(noisePoints[0]); ++i) {
         noisePoints[0][i] = xorShift() & 0xff;
@@ -34,7 +34,7 @@ static void initNoisePoints()
     }
 }
 
-static void moveNoisePoints()
+static void moveNoisePoints( void )
 {
     for(unsigned i = 0; i < ELEMENT_COUNT(noisePoints[0]); ++i) {
         noisePoints[0][i] = noisePoints[1][i];
@@ -57,7 +57,7 @@ static void computeCtrlPoints( uint8_t const offset )
     }
 }
 
-static void computeLeds()
+static void computeLeds( void )
 {
     for(unsigned i = 0; i< ELEMENT_COUNT(leds); ++i) {
         const uint8_t a =  i / 32;
@@ -67,7 +67,7 @@ static void computeLeds()
     }
 }
 
-static void sendLeds()
+static void sendLeds( void )
 {
     struct Color color;
     
