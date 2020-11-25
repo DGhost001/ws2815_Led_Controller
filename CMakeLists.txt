@@ -11,11 +11,16 @@ SET(SOURCE
     crc16.c
     keyboard.c
     leds.c
+    settings.c
+)
+
+SET(HEADER
     colorTable.h
     crc16.h
     keyboard.h
     leds.h
-)
+    settings.h
+    )
 
 SET(EXECUTABLE ledStripeController)
 
@@ -23,6 +28,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 add_executable(${EXECUTABLE}
         ${SOURCE}
+        ${HEADER}
 )
 
 add_custom_command(TARGET ${EXECUTABLE} POST_BUILD
