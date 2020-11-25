@@ -3,15 +3,15 @@
 
 #include <stdint.h>
 
+#include "colorTable.h"
+
 enum {
     SETTINGS_VERSION = 1
 };
 
 struct Settings {
     uint8_t mode;
-    uint8_t red;
-    uint8_t green;
-    uint8_t blue;
+    struct Color color;
 };
 
 
