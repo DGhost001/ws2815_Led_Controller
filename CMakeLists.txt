@@ -33,6 +33,7 @@ add_executable(${EXECUTABLE}
 
 add_custom_command(TARGET ${EXECUTABLE} POST_BUILD
     COMMAND avr-size --format=berkeley ${EXECUTABLE}
+    COMMAND readelf -S ${EXECUTABLE}
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
     )
 
