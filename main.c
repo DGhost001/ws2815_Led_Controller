@@ -7,13 +7,15 @@
 #include "colorTable.h"
 #include "keyboard.h"
 #include "leds.h"
+#include "settings.h"
 
 #define ELEMENT_COUNT(X) (sizeof(X) / sizeof (X[0]))
 
 static uint8_t leds[660];
 static uint8_t noisePoints[2][22];
 static uint8_t ctrlPoints[ELEMENT_COUNT(noisePoints[0])];
-static __flash struct Color const * currentTable;
+static struct Settings * settings;
+
 
 static uint16_t xorShift( void )
 {
@@ -67,36 +69,51 @@ static void computeLeds( void )
     }
 }
 
+static __flash struct Color const * getColorTable( void )
+{
+    switch (settings->mode) {
+    case 0: return &fire[0];
+    case 1: return &blueSee[0];
+    case 2: return &jungle[0];
+    case 3: return &night[0];
+    default: return &fire[0];
+    }
+}
+
+
 static void sendLeds( void )
 {
     struct Color color;
-    
-    cli();
-    
-    for(unsigned i = 0; i< ELEMENT_COUNT(leds); ++i) {
-        color = readColorFromFlash(&currentTable[leds[i]]);
-        sendColor(&color);
+    __flash struct Color const * const currentTable = getColorTable();
+
+    {
+        cli();
+
+        for(unsigned i = 0; i< ELEMENT_COUNT(leds); ++i) {
+            color = readColorFromFlash(&currentTable[leds[i]]);
+            sendColor(&color);
+        }
+
+        sei();
     }
-    
-    sei();
 }
 
 static void handleKeyBoard( void )
 {
     if(isKeyPressed(KEY_1)/* && isKeyToggled(KEY_1) */) {
-        currentTable = &fire[0];
+        settings->mode = 0;
     }
 
     if(isKeyPressed(KEY_2) /* && isKeyToggled(KEY_2) */) {
-        currentTable = &blueSee[0];
+        settings->mode = 1;
     }
 
     if(isKeyPressed(KEY_3) /* && isKeyToggled(KEY_3) */) {
-        currentTable = &jungle[0];
+        settings->mode = 2;
     }
 
     if(isKeyPressed(KEY_5) /* && isKeyToggled(KEY_5) */) {
-        currentTable = &night[0];
+        settings->mode = 3;
     }
 }
 
@@ -109,7 +126,12 @@ ISR (TIMER0_OVF_vect)
 int main( void )
 {
     uint8_t offset = 0;
-    currentTable = &fire[0];
+
+    settings = loadSettings();
+
+    if(!settings) {
+        settings = newSettings();
+    }
 
     initLeds();
     initNoisePoints();
